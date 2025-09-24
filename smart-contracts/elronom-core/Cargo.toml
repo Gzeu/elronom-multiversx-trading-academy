@@ -1,0 +1,31 @@
+[package]
+name = "elronom-core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "elronom_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+multiversx-sc = { version = "0.47.0" }
+
+[dev-dependencies]
+multiversx-sc-scenario = { version = "0.47.0" }
+multiversx-sc-meta = { version = "0.47.0" }
+
+[[bin]]
+name = "elronom-core-meta"
+path = "meta/src/main.rs"
+
+[workspace]
+members = [
+    "meta",
+    "tests",
+    "scenarios"
+]
+
+[workspace.dependencies]
+multiversx-sc = { version = "0.47.0" }
+multiversx-sc-meta = { version = "0.47.0" }
+multiversx-sc-scenario = { version = "0.47.0" }
