@@ -1,38 +1,70 @@
 {
   "name": "elronom-multiversx-trading-academy",
-  "version": "0.1.0",
-  "description": "🎮 ELRONOM - The MultiversX Trading Academy: Educational gamified blockchain app teaching trading and EGLD with NFT rewards, quests, and AI mentorship",
+  "version": "1.0.0",
+  "description": "🎮 ELRONOM - The MultiversX Trading Academy: Educational gamified blockchain app teaching trading and EGLD with NFT rewards, quests, AI mentorship, and enterprise-grade features - 2025 Edition",
   "private": true,
+  "type": "module",
   "workspaces": [
     "frontend",
     "backend",
-    "mobile"
+    "mobile",
+    "smart-contracts",
+    "shared"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:mobile\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
-    "build": "npm run build:frontend && npm run build:backend",
+    "dev:mobile": "cd mobile && npm run dev",
+    "build": "npm run build:shared && npm run build:frontend && npm run build:backend && npm run build:mobile",
+    "build:shared": "cd shared && npm run build",
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
-    "test": "npm run test:frontend && npm run test:backend",
+    "build:mobile": "cd mobile && npm run build",
+    "test": "npm run test:shared && npm run test:frontend && npm run test:backend && npm run test:mobile",
+    "test:shared": "cd shared && npm run test",
     "test:frontend": "cd frontend && npm run test",
     "test:backend": "cd backend && npm run test",
-    "lint": "npm run lint:frontend && npm run lint:backend",
+    "test:mobile": "cd mobile && npm run test",
+    "test:e2e": "playwright test",
+    "test:coverage": "npm run test -- --coverage",
+    "lint": "npm run lint:shared && npm run lint:frontend && npm run lint:backend && npm run lint:mobile",
+    "lint:shared": "cd shared && npm run lint",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:backend": "cd backend && npm run lint",
+    "lint:mobile": "cd mobile && npm run lint",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\"",
+    "type-check": "tsc --noEmit",
     "contracts:build": "cd smart-contracts && sc-meta all build",
     "contracts:test": "cd smart-contracts && sc-meta all test",
     "contracts:deploy:testnet": "cd smart-contracts && npm run deploy:testnet",
-    "setup": "npm install && npm run setup:frontend && npm run setup:backend",
+    "contracts:deploy:mainnet": "cd smart-contracts && npm run deploy:mainnet",
+    "contracts:upgrade": "cd smart-contracts && npm run upgrade",
+    "setup": "npm install && npm run setup:workspaces",
+    "setup:workspaces": "npm run setup:shared && npm run setup:frontend && npm run setup:backend && npm run setup:mobile",
+    "setup:shared": "cd shared && npm install",
     "setup:frontend": "cd frontend && npm install",
     "setup:backend": "cd backend && npm install",
-    "clean": "npm run clean:frontend && npm run clean:backend",
-    "clean:frontend": "cd frontend && rm -rf .next node_modules",
+    "setup:mobile": "cd mobile && npm install",
+    "clean": "npm run clean:workspaces && rm -rf node_modules",
+    "clean:workspaces": "npm run clean:shared && npm run clean:frontend && npm run clean:backend && npm run clean:mobile",
+    "clean:shared": "cd shared && rm -rf dist node_modules",
+    "clean:frontend": "cd frontend && rm -rf .next dist node_modules",
     "clean:backend": "cd backend && rm -rf dist node_modules",
+    "clean:mobile": "cd mobile && rm -rf dist node_modules",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down"
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "security:audit": "npm audit --audit-level moderate",
+    "security:fix": "npm audit fix",
+    "analyze:bundle": "npm run build && npx webpack-bundle-analyzer",
+    "pre-commit": "lint-staged",
+    "prepare": "husky install",
+    "release": "standard-version",
+    "deploy:staging": "vercel --scope team",
+    "deploy:production": "vercel --prod --scope team"
   },
   "repository": {
     "type": "git",
@@ -52,7 +84,12 @@
     "pwa",
     "typescript",
     "rust",
-    "smart-contracts"
+    "smart-contracts",
+    "monorepo",
+    "enterprise",
+    "2025",
+    "mobile-app",
+    "cross-platform"
   ],
   "author": {
     "name": "George Pricop",
@@ -63,16 +100,29 @@
   "bugs": {
     "url": "https://github.com/Gzeu/elronom-multiversx-trading-academy/issues"
   },
-  "homepage": "https://github.com/Gzeu/elronom-multiversx-trading-academy#readme",
+  "homepage": "https://elronom-academy.vercel.app",
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.0.2",
-    "prettier": "^3.0.3"
+    "concurrently": "^9.0.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "eslint": "^9.11.1",
+    "typescript": "^5.6.2",
+    "@playwright/test": "^1.47.2",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "standard-version": "^9.5.0",
+    "cross-env": "^7.0.3",
+    "rimraf": "^6.0.1",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.13"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -86,5 +136,9 @@
   "funding": {
     "type": "individual",
     "url": "https://github.com/sponsors/Gzeu"
+  },
+  "volta": {
+    "node": "20.18.0",
+    "npm": "10.8.2"
   }
 }
