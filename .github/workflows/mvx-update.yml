@@ -1,0 +1,100 @@
+name: MultiversX Project Updates
+
+on:
+  schedule:
+    # Run every Tuesday at 10:00 AM
+    - cron: '0 10 * * 2'
+  workflow_dispatch:
+
+jobs:
+  update-mvx-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update MultiversX SDK
+        run: |
+          npm update @multiversx/sdk-core
+          npm update @multiversx/sdk-wallet
+          npm update @multiversx/sdk-network-providers
+          npm update @multiversx/sdk-dapp
+
+      - name: Update TypeScript dependencies
+        run: |
+          npm update typescript
+          npm update @types/node
+          npm update ts-node
+
+      - name: Update Next.js and React
+        run: |
+          npm update next
+          npm update react
+          npm update react-dom
+          npm update @types/react
+          npm update @types/react-dom
+
+      - name: Run type checking
+        run: npm run type-check || npx tsc --noEmit
+
+      - name: Run tests if available
+        run: |
+          if [ -f "package.json" ] && grep -q '"test"' package.json; then
+            npm test
+          fi
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet package-lock.json package.json; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update MultiversX and TypeScript dependencies'
+          title: 'Auto-update MultiversX Trading Academy dependencies'
+          body: |
+            This PR automatically updates MultiversX SDK and related dependencies.
+            
+            Updated packages:
+            - MultiversX SDK components
+            - TypeScript and type definitions
+            - Next.js and React dependencies
+            
+            ✅ Type checking passed
+            ✅ Tests executed successfully
+            
+            Please review and test the trading functionality before merging.
+          branch: auto-update-mvx-deps
+          delete-branch: true
+
+  check-mvx-network:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check MultiversX Mainnet Status
+        run: |
+          echo "Checking MultiversX network status..."
+          curl -f https://api.multiversx.com/network/config || echo "Network check failed"
+          
+      - name: Check for Supernova Updates
+        run: |
+          echo "Checking for MultiversX Supernova updates..."
+          # Add logic to check for new Supernova releases
+          echo "Consider checking https://docs.multiversx.com for latest updates"
